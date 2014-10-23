@@ -10,17 +10,17 @@ describe Ganglia::GMetric do
     it "should pack an int & uint into XDR format" do
       xdr = Ganglia::XDRPacket.new
       xdr.pack_int(1)
-      xdr.data.should == "\000\000\000\001"
+      expect(xdr.data).to eq "\000\000\000\001"
 
       xdr = Ganglia::XDRPacket.new
       xdr.pack_uint(8)
-      xdr.data.should == "\000\000\000\b"
+      expect(xdr.data).to eq "\000\000\000\b"
     end
 
     it "should pack string" do
       xdr = Ganglia::XDRPacket.new
       xdr.pack_string("test")
-      xdr.data.should == "\000\000\000\004test"
+      expect(xdr.data).to eq "\000\000\000\004test"
     end
   end
 
@@ -36,57 +36,57 @@ describe Ganglia::GMetric do
     }
 
     g = Ganglia::GMetric.pack(data)
-    g.size.should == 2
-    g[0].should == "\000\000\000\200\000\000\000\000\000\000\000\003foo\000\000\000\000\000\000\000\000\006string\000\000\000\000\000\003foo\000\000\000\000\000\000\000\000\003\000\000\000<\000\000\000\000\000\000\000\001\000\000\000\005GROUP\000\000\000\000\000\000\000"
-    g[1].should == "\000\000\000\205\000\000\000\000\000\000\000\003foo\000\000\000\000\000\000\000\000\002%s\000\000\000\000\000\003bar\000"
+    expect(g.size).to eq 2
+    expect(g[0]).to eq "\000\000\000\200\000\000\000\000\000\000\000\003foo\000\000\000\000\000\000\000\000\006string\000\000\000\000\000\003foo\000\000\000\000\000\000\000\000\003\000\000\000<\000\000\000\000\000\000\000\001\000\000\000\005GROUP\000\000\000\000\000\000\000"
+    expect(g[1]).to eq "\000\000\000\205\000\000\000\000\000\000\000\003foo\000\000\000\000\000\000\000\000\002%s\000\000\000\000\000\003bar\000"
   end
 
   it "should raise an error on missing name, value, type" do
     %w(name value type).each do |key|
-      lambda {
+      expect {
         data = {:name => 'a', :type => 'b', :value => 'c'}
         data.delete key.to_sym
         Ganglia::GMetric.pack(data)
-      }.should raise_error
+      }.to raise_error
     end
   end
 
   it "should verify type and raise error on invalid type" do
     %w(string int8 uint8 int16 uint16 int32 uint32 float double).each do |type|
-      lambda {
+      expect {
         data = {:name => 'a', :type => type, :value => 'c'}
         Ganglia::GMetric.pack(data)
-      }.should_not raise_error
+      }.not_to raise_error
     end
 
-    lambda {
+    expect {
       data = {:name => 'a', :type => 'int', :value => 'c'}
       Ganglia::GMetric.pack(data)
-    }.should raise_error
+    }.to raise_error
   end
 
   it "should allow host spoofing" do
-    lambda {
+    expect {
       data = {:name => 'a', :type => 'uint8', :value => 'c', :spoof => 1, :host => 'host'}
       Ganglia::GMetric.pack(data)
 
       data = {:name => 'a', :type => 'uint8', :value => 'c', :spoof => true, :host => 'host'}
       Ganglia::GMetric.pack(data)
-    }.should_not raise_error
+    }.not_to raise_error
 
   end
 
   it "should allow group meta data" do
-    lambda {
+    expect {
       data = {:name => 'a', :type => 'uint8', :value => 'c', :spoof => 1, :host => 'host', :group => 'test'}
       g = Ganglia::GMetric.pack(data)
-      g[0].should == "\000\000\000\200\000\000\000\000\000\000\000\001a\000\000\000\000\000\000\001\000\000\000\005uint8\000\000\000\000\000\000\001a\000\000\000\000\000\000\000\000\000\000\003\000\000\000<\000\000\000\000\000\000\000\001\000\000\000\005GROUP\000\000\000\000\000\000\004test"
+      expect(g[0]).to eq "\000\000\000\200\000\000\000\000\000\000\000\001a\000\000\000\000\000\000\001\000\000\000\005uint8\000\000\000\000\000\000\001a\000\000\000\000\000\000\000\000\000\000\003\000\000\000<\000\000\000\000\000\000\000\001\000\000\000\005GROUP\000\000\000\000\000\000\004test"
 
-    }.should_not raise_error
+    }.not_to raise_error
   end
 
   it "should use EM reactor if used within event loop" do
-    pending 'stub out connection class'
+    skip 'stub out connection class'
 
     require 'eventmachine'
     EventMachine.run do

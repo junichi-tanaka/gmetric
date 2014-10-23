@@ -1,5 +1,5 @@
 require 'rake'
-require 'spec/rake/spectask'
+require 'rspec/core/rake_task'
 
 begin
   require 'jeweler'
@@ -20,9 +20,9 @@ end
 
 task :default => :spec
 
-Spec::Rake::SpecTask.new do |t|
+RSpec::Core::RakeTask.new do |t|
   t.ruby_opts = ['-rtest/unit']
-  t.spec_files = FileList['spec/**/*_spec.rb']
+  t.pattern = 'spec/**/*_spec.rb'
 end
 
 

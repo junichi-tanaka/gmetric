@@ -45,7 +45,7 @@ Gem::Specification.new do |s|
   else
   end
   s.add_development_dependency "rake"
-  s.add_development_dependency "rspec"
+  s.add_development_dependency "rspec", "~> 3.0"
   s.add_development_dependency "eventmachine"
 end
 
