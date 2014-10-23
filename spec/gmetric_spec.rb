@@ -26,6 +26,7 @@ describe Ganglia::GMetric do
 
   it "should pack GMetric into XDR format from Ruby hash" do
     data = {
+      :group => '',
       :slope => 'both',
       :name => 'foo',
       :value => 'bar',
@@ -85,12 +86,22 @@ describe Ganglia::GMetric do
     }.not_to raise_error
   end
 
+  it "should deny group meta data" do
+    expect {
+      data = {:name => 'a', :type => 'uint8', :value => 'c', :spoof => 1, :host => 'host'}
+      g = Ganglia::GMetric.pack(data)
+      expect(g[0]).to eq "\000\000\000\200\000\000\000\000\000\000\000\001a\000\000\000\000\000\000\001\000\000\000\005uint8\000\000\000\000\000\000\001a\000\000\000\000\000\000\000\000\000\000\003\000\000\000<\000\000\000\000\000\000\000\000"
+
+    }.not_to raise_error
+  end
+
   it "should use EM reactor if used within event loop" do
     skip 'stub out connection class'
 
     require 'eventmachine'
     EventMachine.run do
       Ganglia::GMetric.send("127.0.0.1", 1111, {
+                              :group => '',
                               :name => 'pageviews',
                               :units => 'req/min',
                               :type => 'uint8',

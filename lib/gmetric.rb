@@ -36,7 +36,6 @@ module Ganglia
     def self.pack(metric)
       metric = {
         :hostname => '',
-        :group    => '',
         :spoof    => 0,
         :units    => '',
         :slope    => 'both',
@@ -67,12 +66,16 @@ module Ganglia
       meta.pack_uint(metric[:tmax].to_i)            # maximum time in seconds between gmetric calls, default 60
       meta.pack_uint(metric[:dmax].to_i)            # lifetime in seconds of this metric, default=0, meaning unlimited
 
-      ## MAGIC NUMBER: equals the elements of extra data, here it's 1 because I added Group.
-      meta.pack_int(1)
-
       ## METADATA EXTRA DATA: functionally key/value
-      meta.pack_string("GROUP")
-      meta.pack_string(metric[:group].to_s)
+      if metric[:group] then
+        ## MAGIC NUMBER: equals the elements of extra data, here it's 1 because I added Group.
+        meta.pack_int(1)
+
+        meta.pack_string("GROUP")
+        meta.pack_string(metric[:group].to_s)
+      else
+        meta.pack_int(0)
+      end
 
       # DATA payload
       data.pack_int(128+5)                          # string message
