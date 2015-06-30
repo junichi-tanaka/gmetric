@@ -48,7 +48,7 @@ describe Ganglia::GMetric do
         data = {:name => 'a', :type => 'b', :value => 'c'}
         data.delete key.to_sym
         Ganglia::GMetric.pack(data)
-      }.to raise_error
+      }.to raise_error(RuntimeError)
     end
   end
 
@@ -63,7 +63,7 @@ describe Ganglia::GMetric do
     expect {
       data = {:name => 'a', :type => 'int', :value => 'c'}
       Ganglia::GMetric.pack(data)
-    }.to raise_error
+    }.to raise_error(RuntimeError)
   end
 
   it "should allow host spoofing" do
