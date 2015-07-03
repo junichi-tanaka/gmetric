@@ -1,3 +1,4 @@
+# coding: ascii-8bit
 require "helper"
 
 describe Ganglia::GMetric do

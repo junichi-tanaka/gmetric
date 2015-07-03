@@ -92,6 +92,7 @@ module Ganglia
   class XDRPacket
     def initialize
       @data = StringIO.new
+      @data.set_encoding('ascii-8bit')
     end
 
     def pack_uint(data)
